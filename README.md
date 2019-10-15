@@ -15,4 +15,8 @@ People who have trouble matching clothes
 4) How will you evaluate your project? If you’re building a predictive model this is trivial: cross validation. If you’re recommending round-the-world trips it might be more difficult.
 
 
-1. Part 1: Rapid generation of training video data through thermal imaging and webcam streaming. 
+1. Part 1: Rapid generation of training video data through thermal imaging and webcam streaming. Specifically for training
+cameras on live animal targets for quick recognition, especially between different animals. Long term hopefully use this
+to then broadly record and classify tracked target behavior. (Bunny health approach)
+
+2. Quick training on animal targets to improve tracking especially when multiple
