@@ -4,8 +4,9 @@ import cv2
 webcam = cv2.VideoCapture(0)
 # camera_module = cv2.VideoCapture(usePiCamera=True)
 
-fourcc = cv2.VideoWriter_fourcc(*'XVID') # this is currently broken
-output = cv2.VideoWriter('output_test.avi', fourcc, 30.0, (720, 1280)) # output name, encoding, FPS, resolution tuple
+resolution = (int(webcam.get(3)), int(webcam.get(4))) #pulls native resolution for the cam
+fourcc = cv2.VideoWriter_fourcc(*'X264') # this is currently broken
+output = cv2.VideoWriter('output_test.avi', fourcc, 30.0, resolution) # output name, encoding, FPS, resolution tuple
 
 
 while(webcam.isOpened()):
