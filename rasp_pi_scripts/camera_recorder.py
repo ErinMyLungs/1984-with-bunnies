@@ -39,9 +39,9 @@ def record_videofeed(camera_object, filename, resolution=None):
     cam_checker(camera_object)
     
     resolution = resolution_setter(camera_object, resolution=resolution)
-    
+    filename += '.avi'
     fourcc = cv2.VideoWriter_fourcc(*'X264')
-    output = cv2.VideoWriter(f'{filename}.avi', fourcc, 30.0, resolution) # output name, encoding, FPS, resolution tuple
+    output = cv2.VideoWriter(filename, fourcc, 30.0, resolution) # output name, encoding, FPS, resolution tuple
 
 
     while(camera_object.isOpened()):
