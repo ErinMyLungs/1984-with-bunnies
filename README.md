@@ -15,21 +15,4 @@ People who have trouble matching clothes
 4) How will you evaluate your project? If you’re building a predictive model this is trivial: cross validation. If you’re recommending round-the-world trips it might be more difficult.
 
 
-Subreddit recommender - the algo.
-
-1. Finding subreddits is garbage. Matching up with users/subreddits based on descriptions is also problematic.
-    * Look at user activity in subreddits
-    * look at sentiment of average content of subreddit?
-        * a month of scraping text posts/content?
-        * ratio of pics to text
-        * average activity?
-    * Use prior subreddit subscriptions and look at similarities of other redditors?
-        * Similarity/recommenders?
-    * Improving recommendations can improve user activity, possibly lower churn, drive user content creation
-        * More cash money
-
-1. PSAW should be realtively easy
-    * subreddit subscription information is not publicly available
-        * where users comment? (Not a good indicator)
-        
-1. Artificially drop a subredditand test if the algo recommends it back? 
+1. Part 1: Rapid generation of training video data through thermal imaging and webcam streaming. 
