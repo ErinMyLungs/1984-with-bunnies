@@ -82,7 +82,6 @@ def preview_window(camera_object, resolution=None):
         else:
             break
         
-    camera_object.release()
     cv2.destroyAllWindows()
     
 if __name__ == '__main__':
