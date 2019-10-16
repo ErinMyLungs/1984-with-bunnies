@@ -92,8 +92,9 @@ def preview_window(camera_object, resolution=None):
 
 if __name__ == '__main__':
     # TODO: Make this own function? Right now just brittle but future refactoring
+    camera_number = int(input('camera hardware number: 0 if rpcam, 1 if webcam: '))
 
-    webcam = cv2.VideoCapture(0)
+    webcam = cv2.VideoCapture(camera_number)
     # TODO: Hook up picam module? Or webcam. Or both.
     # camera_module = cv2.VideoCapture(usePiCamera=True)
     
