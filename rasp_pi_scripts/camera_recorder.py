@@ -44,7 +44,8 @@ def record_videofeed(camera_object, filename, resolution=None, time_record=1,dis
     resolution = resolution_setter(camera_object, resolution=resolution)
 
     filename += '.avi'
-    fourcc = cv2.VideoWriter_fourcc(*'X264')
+    fourcc = cv2.VideoWriter_fourcc(*'X264') #raspberry pi encoder settings
+    # fourcc = cv2.VideoWriter_fourcc(*'MJPG') # laptop encoder settings
     output = cv2.VideoWriter(filename, fourcc, 30.0, resolution) # output name, encoding, FPS, resolution tuple
 
     time_end = time.time() + 60 * 60 * time_record #makes end time by seconds/min * min/hour * hours to rec.
@@ -66,7 +67,6 @@ def record_videofeed(camera_object, filename, resolution=None, time_record=1,dis
     # When everything done, release the output
     output.release()
     cv2.destroyAllWindows()
-    return
 
 def preview_window(camera_object, resolution=None):
     """
@@ -82,7 +82,7 @@ def preview_window(camera_object, resolution=None):
         if ret:
             cv2.imshow('frame', frame)
             
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+            if cv2.waitKey(1) & 0xFF == ord('q'): # possibly update waitkey to 33.3?
                 break
         else:
             break
