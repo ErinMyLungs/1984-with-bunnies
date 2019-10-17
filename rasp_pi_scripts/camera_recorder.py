@@ -48,7 +48,7 @@ def record_videofeed(camera_object, resolution=None, time_record=1, display_prei
     # fourcc = cv2.VideoWriter_fourcc(*'MJPG') # laptop encoder settings
     output = cv2.VideoWriter('output.avi', fourcc, 30.0, resolution) # output name, encoding, FPS, resolution tuple
 
-    time_end = time.time() + 15 #60 * 60 * time_record #makes end time by seconds/min * min/hour * hours to rec.
+    time_end = time.time() + 60 * 60 * time_record #makes end time by seconds/min * min/hour * hours to rec.
 
     while(camera_object.isOpened()) and time.time() < time_end:
         # Capture frame-by-frame
