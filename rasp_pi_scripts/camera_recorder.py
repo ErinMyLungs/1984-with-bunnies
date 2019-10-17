@@ -3,6 +3,7 @@ import numpy as np
 import time
 import cv2
 from datetime import datetime
+import os
 
 def cam_checker(camera_object):
     """
@@ -30,11 +31,10 @@ def resolution_setter(camera_object, resolution):
     camera_object.set(4, resolution[1])
     return resolution
 
-def record_videofeed(camera_object, filename_str, resolution=None, time_record=1, display_preivew=False, **kwargs):
+def record_videofeed(camera_object, resolution=None, time_record=1, display_preivew=False, **kwargs):
     """
     Takes in camera object and records to filename until stopped with q command
     :param camera_object: cv2.VideoCapture of device
-    :param filename_str: filename to record to
     :param resolution: (width:int, height:int) vid resolution to record at
     :param time_record: how long to record either float or int. 1 = 1 hour.
     :return: filename.avi in $PWD
@@ -43,13 +43,10 @@ def record_videofeed(camera_object, filename_str, resolution=None, time_record=1
     cam_checker(camera_object)
     resolution = resolution_setter(camera_object, resolution=resolution)
 
-    filename_str += '.avi'
-    # todo: remove or refactor if this works
-    test_str = ''
-    test_str.join([char for char in filename_str])
+
     fourcc = cv2.VideoWriter_fourcc(*'X264') #raspberry pi encoder settings
     # fourcc = cv2.VideoWriter_fourcc(*'MJPG') # laptop encoder settings
-    output = cv2.VideoWriter(test_str, fourcc, 30.0, resolution) # output name, encoding, FPS, resolution tuple
+    output = cv2.VideoWriter('output.avi', fourcc, 30.0, resolution) # output name, encoding, FPS, resolution tuple
 
     time_end = time.time() + 15 #60 * 60 * time_record #makes end time by seconds/min * min/hour * hours to rec.
 
@@ -115,7 +112,8 @@ if __name__ == '__main__':
 
         for _ in range(length):
             current_dt = datetime.now()
-            filename_string = f'{current_dt.month}-{current_dt.day}-{current_dt.year}-{current_dt.time().isoformat()[:8]}'
-            record_videofeed(webcam, filename_string, resolution, time_record=1, display_preivew=display)
+            filename_string = f'{current_dt.month}-{current_dt.day}-{current_dt.year}-{current_dt.time().isoformat()[:8]}.avi'
 
+            record_videofeed(webcam, resolution, time_record=1, display_preivew=display)
+            os.rename('output.avi', filename_string)
     webcam.release()
