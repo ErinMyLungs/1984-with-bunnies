@@ -3,6 +3,7 @@ import numpy as np
 import time
 import cv2
 from datetime import datetime
+import os
 
 def cam_checker(camera_object):
     """
@@ -30,11 +31,10 @@ def resolution_setter(camera_object, resolution):
     camera_object.set(4, resolution[1])
     return resolution
 
-def record_videofeed(camera_object, filename, resolution=None, time_record=1,display_preivew=False, **kwargs):
+def record_videofeed(camera_object, resolution=None, time_record=1, display_preivew=False, **kwargs):
     """
     Takes in camera object and records to filename until stopped with q command
     :param camera_object: cv2.VideoCapture of device
-    :param filename: filename to record to
     :param resolution: (width:int, height:int) vid resolution to record at
     :param time_record: how long to record either float or int. 1 = 1 hour.
     :return: filename.avi in $PWD
@@ -43,9 +43,10 @@ def record_videofeed(camera_object, filename, resolution=None, time_record=1,dis
     cam_checker(camera_object)
     resolution = resolution_setter(camera_object, resolution=resolution)
 
-    filename += '.avi'
-    fourcc = cv2.VideoWriter_fourcc(*'X264')
-    output = cv2.VideoWriter(filename, fourcc, 30.0, resolution) # output name, encoding, FPS, resolution tuple
+
+    fourcc = cv2.VideoWriter_fourcc(*'X264') #raspberry pi encoder settings
+    # fourcc = cv2.VideoWriter_fourcc(*'MJPG') # laptop encoder settings
+    output = cv2.VideoWriter('output.avi', fourcc, 30.0, resolution) # output name, encoding, FPS, resolution tuple
 
     time_end = time.time() + 60 * 60 * time_record #makes end time by seconds/min * min/hour * hours to rec.
 
@@ -66,7 +67,6 @@ def record_videofeed(camera_object, filename, resolution=None, time_record=1,dis
     # When everything done, release the output
     output.release()
     cv2.destroyAllWindows()
-    return
 
 def preview_window(camera_object, resolution=None):
     """
@@ -82,7 +82,7 @@ def preview_window(camera_object, resolution=None):
         if ret:
             cv2.imshow('frame', frame)
             
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+            if cv2.waitKey(1) & 0xFF == ord('q'): # possibly update waitkey to 33.3?
                 break
         else:
             break
@@ -92,8 +92,9 @@ def preview_window(camera_object, resolution=None):
 
 if __name__ == '__main__':
     # TODO: Make this own function? Right now just brittle but future refactoring
+    camera_number = int(input('camera hardware number: 0 if rpcam, 1 if webcam: '))
 
-    webcam = cv2.VideoCapture(0)
+    webcam = cv2.VideoCapture(camera_number)
     # TODO: Hook up picam module? Or webcam. Or both.
     # camera_module = cv2.VideoCapture(usePiCamera=True)
     
@@ -109,9 +110,10 @@ if __name__ == '__main__':
         except ValueError:
             print('length has to be int coercible')
 
-        for _ in range(length+1):
+        for _ in range(length):
             current_dt = datetime.now()
-            filename_string = f'{current_dt.month}-{current_dt.day}-{current_dt.year}: {current_dt.time().isoformat()[:8]}'
-            record_videofeed(webcam, filename_string, resolution, time_record=1, display_preivew=display)
+            filename_string = f'{current_dt.month}-{current_dt.day}-{current_dt.year}-{current_dt.time().isoformat()[:8]}.avi'
 
+            record_videofeed(webcam, resolution, time_record=1, display_preivew=display)
+            os.rename('output.avi', filename_string)
     webcam.release()
