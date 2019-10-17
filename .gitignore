@@ -1,3 +1,9 @@
+# Repo specific ignores
+# Data folder ignore, including example video and heatmap csv for reference
+data/*
+!data/example_heatmap.csv
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
