@@ -20,9 +20,10 @@ camera.resolution = (288, 368)  # start with a slightly larger image so we can c
 camera.framerate = 20
 rawCapture = PiRGBArray(camera, size=(288, 368))
 
-# fourcc = cv2.VideoWriter_fourcc(*'X264')  # raspberry pi encoder settings
-# video_output = cv2.VideoWriter('raw_video.avi', fourcc, 30.0, resolution)  # output name, encoding, FPS, resolution tuple
-# heat_output = cv2.VideoWriter('thermal_heatmap.avi', fourcc, 30.0, resolution)  # output name, encoding, FPS, resolution tuple
+resolution = (240,320)
+fourcc = cv2.VideoWriter_fourcc(*'X264')  # raspberry pi encoder settings
+video_output = cv2.VideoWriter('raw_video.avi', fourcc, 8.0, resolution)  # output name, encoding, FPS, resolution tuple
+heat_output = cv2.VideoWriter('thermal_heatmap.avi', fourcc, 8.0, resolution)  # output name, encoding, FPS, resolution tuple
 
 
 # allow the camera to warmup
@@ -34,7 +35,7 @@ alpha1 = 0.5
 alpha2 = 0.5
 
 prevData = []
-
+end = time.time() + 30
 for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=True):
     # Capture frame-by-frame
     frame = frame.array
@@ -108,6 +109,11 @@ for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=
         nmax -= 10
         print(nmax)
 
+    heat_output.write(heatmap)
+    video_output.write(frame)
+
+    if time.time() >= end: # stop process after 30 seconds
+        break
 cv2.destroyAllWindows()
 
 
