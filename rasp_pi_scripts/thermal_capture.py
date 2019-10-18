@@ -87,6 +87,8 @@ for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=
     # Display the resulting frame
     cv2.namedWindow('Thermal', cv2.WINDOW_NORMAL)
     cv2.imshow('Thermal', heatmap)
+    
+    rawCapture.truncate(0)
 
     res = cv2.waitKey(1)
     # print(res)
