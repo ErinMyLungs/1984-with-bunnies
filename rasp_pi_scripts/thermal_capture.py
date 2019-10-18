@@ -114,6 +114,8 @@ for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=
 
     if time.time() >= end: # stop process after 30 seconds
         break
+heat_output.release()
+video_output.release()
 cv2.destroyAllWindows()
 
 
