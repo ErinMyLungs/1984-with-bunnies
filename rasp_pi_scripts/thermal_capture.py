@@ -109,11 +109,12 @@ for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=
         nmax -= 10
         print(nmax)
 
-    heat_output.write(np.array(heatmap, dtype=np.uint8))
-    video_output.write(np.array(frame, dtype=np.uint8))
+    heat_output.write(heatmap)
+    video_output.write(frame)
 
     if time.time() >= end: # stop process after 30 seconds
         break
+
 heat_output.release()
 video_output.release()
 cv2.destroyAllWindows()
