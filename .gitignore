@@ -2,6 +2,8 @@
 # Data folder ignore, including example video and heatmap csv for reference
 data/*
 !data/example_heatmap.csv
+!data/example_heatmap.avi
+!data/example_video.avi
 
 
 # Byte-compiled / optimized / DLL files
