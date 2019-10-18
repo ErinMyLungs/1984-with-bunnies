@@ -35,7 +35,7 @@ alpha1 = 0.5
 alpha2 = 0.5
 
 prevData = []
-end = time.time() + 30
+end = time.time() + 15
 for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=True):
     # Capture frame-by-frame
     frame = frame.array
@@ -109,8 +109,10 @@ for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=
         nmax -= 10
         print(nmax)
 
-    heat_output.write(heatmap)
-    video_output.write(frame)
+    heat_frame = cv2.imread(heatmap)
+    video_frame = cv2.imread(frame)
+    heat_output.write(heat_frame)
+    video_output.write(video_frame)
 
     if time.time() >= end: # stop process after 30 seconds
         break
