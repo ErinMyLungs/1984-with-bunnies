@@ -20,7 +20,7 @@ camera.resolution = (288, 368)  # start with a slightly larger image so we can c
 camera.framerate = 20
 rawCapture = PiRGBArray(camera, size=(288, 368))
 
-fourcc = cv2.VideoWriter_fourcc(*'X264')  # raspberry pi encoder settings
+# fourcc = cv2.VideoWriter_fourcc(*'X264')  # raspberry pi encoder settings
 # video_output = cv2.VideoWriter('raw_video.avi', fourcc, 30.0, resolution)  # output name, encoding, FPS, resolution tuple
 # heat_output = cv2.VideoWriter('thermal_heatmap.avi', fourcc, 30.0, resolution)  # output name, encoding, FPS, resolution tuple
 
@@ -82,7 +82,7 @@ for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=
 
     heatmap = cv2.normalize(heatmap, None, nmin, nmax, cv2.NORM_MINMAX)
     heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
-    # heatmap = cv2.resize(heatmap, (240, 320), interpolation=cv2.INTER_CUBIC)
+    heatmap = cv2.resize(heatmap, (240, 320), interpolation=cv2.INTER_CUBIC)
 
     # Display the resulting frame
     cv2.namedWindow('Thermal', cv2.WINDOW_NORMAL)
