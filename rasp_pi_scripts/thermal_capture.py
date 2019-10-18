@@ -88,7 +88,7 @@ for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=
     # Display the resulting frame
     cv2.namedWindow('Thermal', cv2.WINDOW_NORMAL)
     cv2.imshow('Thermal', heatmap)
-    
+
     rawCapture.truncate(0)
 
     res = cv2.waitKey(1)
@@ -109,10 +109,8 @@ for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=
         nmax -= 10
         print(nmax)
 
-    heat_frame = cv2.imread(heatmap)
-    video_frame = cv2.imread(frame)
-    heat_output.write(heat_frame)
-    video_output.write(video_frame)
+    heat_output.write(np.array(heatmap, dtype=np.uint8))
+    video_output.write(np.array(frame, dtype=np.uint8))
 
     if time.time() >= end: # stop process after 30 seconds
         break
