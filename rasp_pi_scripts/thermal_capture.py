@@ -20,6 +20,11 @@ camera.resolution = (288, 368)  # start with a slightly larger image so we can c
 camera.framerate = 20
 rawCapture = PiRGBArray(camera, size=(288, 368))
 
+fourcc = cv2.VideoWriter_fourcc(*'X264')  # raspberry pi encoder settings
+# video_output = cv2.VideoWriter('raw_video.avi', fourcc, 30.0, resolution)  # output name, encoding, FPS, resolution tuple
+# heat_output = cv2.VideoWriter('thermal_heatmap.avi', fourcc, 30.0, resolution)  # output name, encoding, FPS, resolution tuple
+
+
 # allow the camera to warmup
 time.sleep(0.1)
 
@@ -66,7 +71,6 @@ for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=
                 if (y == 16) and (x == 12):
                     temp = data[index]
                 index += 1
-        heatmap = cv2.flip(heatmap, -1)  # flip heatmap to match image
         prev_heatmap = heatmap  # save the heatmap in case we get a data miss
 
     else:
@@ -78,27 +82,11 @@ for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=
 
     heatmap = cv2.normalize(heatmap, None, nmin, nmax, cv2.NORM_MINMAX)
     heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
-    heatmap = cv2.resize(heatmap, (240, 320), interpolation=cv2.INTER_CUBIC)
+    # heatmap = cv2.resize(heatmap, (240, 320), interpolation=cv2.INTER_CUBIC)
 
     # Display the resulting frame
     cv2.namedWindow('Thermal', cv2.WINDOW_NORMAL)
-
-    # Sharpen the image up so we can see edges under the heatmap
-    kernel = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]])
-    frame = cv2.filter2D(frame, -1, kernel)
-
-    frame = cv2.addWeighted(frame, alpha1, heatmap, alpha2, 0)  # combine the images
-
-    cv2.line(frame, (120, 150), (120, 170), (0, 0, 0), 1)  # vline
-    cv2.line(frame, (110, 160), (130, 160), (0, 0, 0), 1)  # hline
-
-    cv2.putText(frame, 'Temp: ' + str(temp), (10, 10), \
-                cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 255), 1, cv2.LINE_AA)
-
     cv2.imshow('Thermal', heatmap)
-
-    # clear the stream in preparation for the next frame
-    rawCapture.truncate(0)
 
     res = cv2.waitKey(1)
     # print(res)
@@ -117,15 +105,18 @@ for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=
     if res == 120:  # x
         nmax -= 10
         print(nmax)
-    if res == 100:  # d
-        alpha1 += 0.1
-        alpha2 -= 0.1
-    if res == 99:  # c
-        alpha1 -= 0.1
-        alpha2 += 0.1
 
 cv2.destroyAllWindows()
 
 
-
+def sharpen_image(frame):
+    """
+    Takes in frame and applies sharpen convolution to the image
+    :param frame: single frame from opencv
+    :return: sharpened frame
+    """
+    # Sharpen the image up so we can see edges under the heatmap
+    kernel = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]])
+    frame = cv2.filter2D(frame, -1, kernel)
+    return frame
 
