@@ -34,8 +34,8 @@ alpha1 = 0.5
 alpha2 = 0.5
 
 prevData = []
-end = time.time() + 15
-
+end = time.time() + 5
+count = 1
 for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=True):
     # Capture frame-by-frame
     frame = frame.array
@@ -109,14 +109,14 @@ for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=
         nmax -= 10
         print(nmax)
 
-    cv2.imwrite('testing_heatmap.jpg', heatmap)
-    cv2.imwrite('testing_video.jpg', frame)
+    cv2.imwrite(f'testing_heatmap{count}.jpg', heatmap)
+    cv2.imwrite(f'testing_video{count}.jpg', frame)
     kernel = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]])
     frame = cv2.filter2D(frame, -1, kernel)
     frame = cv2.addWeighted(frame, alpha1, heatmap, alpha2, 0)  # combine the images
-    cv2.imwrite('testing_combo_frame.jpg', frame)
+    cv2.imwrite(f'testing_combo_frame{count}.jpg', frame)
 
-    if time.time() >= end: # stop process after 30 seconds
+    if time.time() >= end: # stop process after 5 seconds
         break
 
 
