@@ -2,3 +2,4 @@ opencv-python
 pytorch
 numpy
 picamera
+boto3
