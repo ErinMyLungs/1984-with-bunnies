@@ -34,11 +34,11 @@ class recorder:
         """
         if not self.resolution:
             # pulls native res from cam and makes tuple of ints for VideoWriter object
-            resolution = (int(self.camera_object.get(3)), int(self.camera_object.get(4)))
+            self.resolution = (int(self.camera_object.get(3)), int(self.camera_object.get(4)))
 
-        self.camera_object.set(3, resolution[0])
-        self.camera_object.set(4, resolution[1])
-        return resolution
+        self.camera_object.set(3, self.resolution[0])
+        self.camera_object.set(4, self.resolution[1])
+        return self.resolution
 
     def record_videofeed(self, time_record=1, display_preivew=False, **kwargs):
         """
@@ -58,6 +58,7 @@ class recorder:
         output = cv2.VideoWriter('output.avi', fourcc, 30.0, resolution) # output name, encoding, FPS, resolution tuple
 
         time_end = time.time() + 60 * 60 * time_record #makes end time by seconds/min * min/hour * hours to rec.
+        # time_end = time.time() + 15 # * 60 * time_record # for testing recorder with 15 second videos
 
         while(self.camera_object.isOpened()) and time.time() < time_end:
             # Capture frame-by-frame
@@ -106,10 +107,11 @@ if __name__ == '__main__':
     webcam = cv2.VideoCapture(camera_number)
     # TODO: Hook up picam module? Or webcam. Or both.
     # camera_module = cv2.VideoCapture(usePiCamera=True)
-    
     resolution = (1280, 720)
-    
-    preview_window(webcam, None)
+
+    webcam_rec = recorder(webcam, resolution)
+
+    webcam_rec.preview_window()
     record = input('Record? y/n: ')
     length = input('How long to record(hours)?: ')
     display = bool(input('display preview?: '))
@@ -123,6 +125,6 @@ if __name__ == '__main__':
             current_dt = datetime.now()
             filename_string = f'{current_dt.month}-{current_dt.day}-{current_dt.year}-{current_dt.time().isoformat()[:8]}.avi'
 
-            record_videofeed(webcam, resolution, time_record=1, display_preivew=display)
+            webcam_rec.record_videofeed(time_record=1, display_preivew=display)
             os.rename('output.avi', filename_string)
     webcam.release()
