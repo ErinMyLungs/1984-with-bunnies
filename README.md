@@ -27,4 +27,4 @@ Install and compile MLX90640 drivers and test if working
 
 | Predictor | Target | Combination |
 | ---- | --- | --- |
-| ![rawgif](images/rawvid.gif) | ![heatmap](images/heatmap.gif) | ![combo](images/combo.gif) |
+| ![rawgif](example_figures/rawvid.gif) | ![heatmap](example_figures/heatmap.gif) | ![combo](example_figures/combo.gif) |
