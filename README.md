@@ -1,22 +1,30 @@
-For your three preliminary proposals, you need a brief description (one paragraph), and to answer four questions.
+## Convolutional Neural Network for animal location tracking
 
-1) Who will use the results of the project? Be specific. It’s ok to have multiple different types of people with different problems, but you need at least one.
-
-Examples: 
-People considering a round-the-world trip
-Farmers who wish to reduce pesticide use
-Anyone who enjoys viewing fall foliage
-People who have trouble matching clothes
-
-2) How will your project solve the users’ problem, or help them in some way? It’s ok if your capstone is just a proof of concept as long as future version could be useful. It doesn’t have to help them a lot or to make money, just solve some sort of problem they have. In particular, it’s not enough that the project is interesting or cool.
-
-3) Where will you get data that will let you solve the problem? You don’t need to verify that all the data you need is available for the preliminary proposal, just have a reasonable expectation that you can get it.
-
-4) How will you evaluate your project? If you’re building a predictive model this is trivial: cross validation. If you’re recommending round-the-world trips it might be more difficult.
+A small library to create and train a convolutional neural network with  thermal imaging from an MLX90640 sensor and video feed before predicting animal location based only on a video stream.
 
 
-1. Part 1: Rapid generation of training video data through thermal imaging and webcam streaming. Specifically for training
-cameras on live animal targets for quick recognition, especially between different animals. Long term hopefully use this
-to then broadly record and classify tracked target behavior. (Bunny health approach)
+### Hardware Requirements:
 
-2. Quick training on animal targets to improve tracking especially when multiple
+Raspberry pi (4b recommended)
+MLX90640 thermal sensor
+Raspberry pi camera module,
+Webcam (optional, logitech c270 (budget) or c920 (better) are great)
+
+
+### Setup
+
+With Raspbian installed, git clone repo onto local device
+Install and compile OpenCV [instructions here](https://www.pyimagesearch.com/2018/09/26/install-opencv-4-on-your-raspberry-pi/)
+ Connect MLX90640 to I2C ports and camera module
+Deploy and run camera_recorder.py from rasp_pi_scripts
+Should show preview of video feed
+Install and compile MLX90640 drivers and test if working
+[MLX90640 Python example repo with code this is based on](https://github.com/leswright1977/mlx90640_python)
+[Repo with drivers to be compiled](https://github.com/pimoroni/mlx90640-library)
+
+
+###Example Images
+
+| Predictor | Target | Combination |
+| ---- | --- | --- |
+| ![rawgif](images/rawvid.gif) | ![heatmap](images/heatmap.gif) | ![combo](images/combo.gif) |
