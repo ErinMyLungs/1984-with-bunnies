@@ -1,27 +1,20 @@
-# Module to capture thermal and video data concurrently
+# Module for previewing thermal and video data
+
 import cv2
 import time
 import random
 import math
+import subprocess
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 import numpy as np
-# a hack to wake our bus if it hangs....
-import subprocess
 
 p = subprocess.run(['i2cdetect', '-y', '1', '0x33', '0x33'])
-#######################################
 
 camera = PiCamera()
 camera.resolution = (288, 368)  # start with a slightly larger image so we can crop and align later!
 camera.framerate = 20
 rawCapture = PiRGBArray(camera, size=(288, 368))
-
-resolution = (240,320)
-fourcc = cv2.VideoWriter_fourcc(*'X264')  # raspberry pi encoder settings
-video_output = cv2.VideoWriter('raw_video.avi', fourcc, 8.0, resolution)  # output name, encoding, FPS, resolution tuple
-heat_output = cv2.VideoWriter('thermal_heatmap.avi', fourcc, 8.0, resolution)  # output name, encoding, FPS, resolution tuple
-
 
 # allow the camera to warmup
 time.sleep(0.1)
@@ -32,7 +25,7 @@ alpha1 = 0.5
 alpha2 = 0.5
 
 prevData = []
-end = time.time() + 15
+
 for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=True):
     # Capture frame-by-frame
     frame = frame.array
@@ -69,6 +62,7 @@ for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=
                 if (y == 16) and (x == 12):
                     temp = data[index]
                 index += 1
+        # heatmap = cv2.flip(heatmap, -1)  # flip heatmap to match image
         prev_heatmap = heatmap  # save the heatmap in case we get a data miss
 
     else:
@@ -84,8 +78,19 @@ for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=
 
     # Display the resulting frame
     cv2.namedWindow('Thermal', cv2.WINDOW_NORMAL)
+
+    # Sharpen the image up so we can see edges under the heatmap
+    kernel = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]])
+    frame = cv2.filter2D(frame, -1, kernel)
+
+    frame = cv2.addWeighted(frame, alpha1, heatmap, alpha2, 0)  # combine the images
+
+    cv2.putText(frame, 'Temp: ' + str(temp), (10, 10), \
+                cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 255), 1, cv2.LINE_AA)
+
     cv2.imshow('Thermal', heatmap)
 
+    # clear the stream in preparation for the next frame
     rawCapture.truncate(0)
 
     res = cv2.waitKey(1)
@@ -105,26 +110,12 @@ for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=
     if res == 120:  # x
         nmax -= 10
         print(nmax)
+    if res == 100:  # d
+        alpha1 += 0.1
+        alpha2 -= 0.1
+    if res == 99:  # c
+        alpha1 -= 0.1
+        alpha2 += 0.1
 
-    heat_output.write(heatmap)
-    video_output.write(frame)
-
-    if time.time() >= end: # stop process after 30 seconds
-        break
-
-heat_output.release()
-video_output.release()
 cv2.destroyAllWindows()
-
-
-def sharpen_image(frame):
-    """
-    Takes in frame and applies sharpen convolution to the image
-    :param frame: single frame from opencv
-    :return: sharpened frame
-    """
-    # Sharpen the image up so we can see edges under the heatmap
-    kernel = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]])
-    frame = cv2.filter2D(frame, -1, kernel)
-    return frame
 
