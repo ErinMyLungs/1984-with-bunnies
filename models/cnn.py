@@ -16,23 +16,23 @@ class Net(nn.Module):
 
     def __init__(self):
         super(Net, self).__init__()
-        # 1 input image channel, 6 output channels, 3x3 square convolution
+        # 3 input image channel, 6 output channels, 3x3 square convolution
         # kernel
-        self.conv1 = nn.Conv2d(3, 6, 5)
+        self.conv1 = nn.Conv2d(3, 6, 3)
         self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(6, 16, 5)
+        self.conv2 = nn.Conv2d(6, 16, 3)
         # an affine operation: y = Wx + b
-        self.fc1 = nn.Linear(16 * 5 * 5, 120)
-        self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, 10)
+        self.fc1 = nn.Linear(53824, 500)
+        self.fc2 = nn.Linear(500, 100)
+        self.fc3 = nn.Linear(100, 57600)
 
     def forward(self, x):
         # max pooling over a (2,2) window
         x = self.pool(F.relu(self.conv1(x)))
         # if size is a square, can only specify single number
         x = self.pool(F.relu(self.conv2(x)))
-        # x = x.view(-1, self.num_flat_features(x))
-        x = x.view(-1, 16 * 5 * 5 )
+        x = x.view(-1, self.num_flat_features(x))
+        # x = x.view(-1, 16 * 5 * 5 )
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
@@ -85,26 +85,45 @@ class Rescale(object):
         self.output_size = output_size
 
     def __call__(self, sample):
-        image, landmarks = sample['image'], sample['landmarks']
+        image, heatmap = sample
+        image = torch.from_numpy(image)
+        heatmap = torch.from_numpy(heatmap)
 
-        h, w = image.shape[:2]
+        new_h, new_w = self.calc_new_dims(image)
+        trans_image = transform.resize(image, (new_h, new_w))
+
+        new_h, new_w = self.calc_new_dims(heatmap)
+        trans_heat = transform.resize(heatmap, (new_h, new_w))
+
+        #h and w swapped for landmark cuz images x axis = 1 and y axis = 0
+
+
+        return {'image':trans_image, 'target':trans_heat}
+
+    def calc_new_dims(self, image):
+        """
+        Returns rescaled dims based on height and width of image
+        :param image: tensor of image data to be rescaled
+        :return: new_h, new_w for resizing
+        """
+        if type(image) != torch.Tensor:
+            if type(image) == np.ndarray:
+                image = torch.from_numpy(image)
+            else:
+                print('Image must be tensor')
+                raise AttributeError
+
+        height, width = image.shape[:2]
 
         if isinstance(self.output_size, int):
-            if h > w:
-                new_h, new_w = self.output_size * h / w, self.output_size
+            if height > width:
+                new_h, new_w = self.output_size * height / width, self.output_size
             else:
-                new_h, new_w = self.output_size, self.output_size * w / h
+                new_h, new_w = self.output_size, self.output_size * width / height
         else:
             new_h, new_w = self.output_size
 
-        new_h, new_w = int(new_h), int(new_w)
-
-        img = transform.resize(image, (new_h, new_w))
-
-        #h and w swapped for landmark cuz images x axis = 1 and y axis = 0
-        landmarks = landmarks * [new_w/w, new_h/h]
-
-        return {'image':img, 'landmarks':landmarks}
+        return int(new_h), int(new_w)
 
 class RandomCrop(object):
     def __init__(self, output_size):
@@ -136,6 +155,20 @@ class ToTensor(object):
         image = image.transpose((2, 0, 1)) #torch image is C X H X W where numpy is H X W X C
         return {'image':torch.from_numpy(image),
                 'landmarks': torch.from_numpy(landmarks)}
+
+
+def load_data():
+    heatmap = io.imread('data/heat/testing_heatmap001.jpg')
+    image = io.imread('data/video/testing_video001.jpg')
+    image = torch.from_numpy(image)
+    heatmap = torch.from_numpy(heatmap)
+    image = image.transpose(0, 2).transpose(1,2)
+    heatmap = heatmap.transpose(0,2).transpose(1,2)
+
+    image = transform.resize(image, (3, 240, 240))
+    heatmap = transform.resize(heatmap, (3, 240, 240))
+
+    return torch.from_numpy(image), torch.from_numpy(heatmap)
 
 if __name__ == '__main__':
     training = True
